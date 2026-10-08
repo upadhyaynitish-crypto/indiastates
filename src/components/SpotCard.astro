@@ -48,8 +48,7 @@ const { spot, number } = Astro.props;
     </h3>
     <p class="text-[15px] leading-relaxed text-slate-700">{spot.description}</p>
     <p class="mt-auto pt-2 text-sm text-slate-700">
-      <span class="font-semibold text-slate-900">Best time:</span>
-      {spot.best_time}
+      <span class="font-semibold text-slate-900">Best time:</span>{' '}{spot.best_time}
     </p>
   </div>
 </article>

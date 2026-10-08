@@ -54,6 +54,8 @@ const payload = JSON.stringify({ boundary, spots, boundaryCredit });
     const { boundary, spots, boundaryCredit } = JSON.parse(el.dataset.stateMap!) as Payload;
 
     const map = L.map(el, { scrollWheelZoom: false, zoomSnap: 0.25 });
+    // Plain prefix: keep political symbols off the map (neutral-tone rule).
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Boundary: ${boundaryCredit}`,

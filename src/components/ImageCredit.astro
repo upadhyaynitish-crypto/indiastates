@@ -11,6 +11,6 @@ const host = new URL(source_url).hostname.includes('wikimedia') ? 'Wikimedia Com
 ---
 
 <span class={className}>
-  Photo: <a href={source_url} class="underline underline-offset-2">{credit}</a>,
-  {license_url ? <a href={license_url} rel="license" class="underline underline-offset-2">{license}</a> : license}, via {host}
+  Photo: <a href={source_url} class="underline underline-offset-2">{credit}</a>{', '}
+  {license_url ? <a href={license_url} rel="license" class="underline underline-offset-2">{license}</a> : license}{' '}via {host}
 </span>

@@ -18,7 +18,7 @@ export default defineConfig({
       name: 'Bricolage Grotesque',
       cssVariable: '--font-bricolage',
       provider: fontProviders.fontsource(),
-      weights: [500, 600, 700, 800],
+      weights: [600, 700],
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],

@@ -1,0 +1,115 @@
+---
+/**
+ * Leaflet map of a single state: its boundary (from src/data/geo) plus
+ * numbered tourist-spot markers that match the spot cards.
+ *
+ * Border policy: the view is locked to the state's own bounds, so the map can
+ * never be zoomed or panned out far enough to show international borders
+ * drawn by the OSM basemap. The India-wide map needs a different approach.
+ */
+interface Spot {
+  name: string;
+  lat: number;
+  lng: number;
+}
+interface Props {
+  name: string;
+  /** GeoJSON FeatureCollection for the state boundary. */
+  boundary: unknown;
+  boundaryCredit: string;
+  spots: Spot[];
+}
+const { name, boundary, boundaryCredit, spots } = Astro.props;
+const payload = JSON.stringify({ boundary, spots, boundaryCredit });
+---
+
+<section aria-labelledby="map-title" class="flex flex-col">
+  <h2 id="map-title" class="sr-only">Map of {name}</h2>
+  <div
+    data-state-map={payload}
+    role="region"
+    aria-label={`Map of ${name} showing ${spots.length} places to visit. The same places are listed below the map.`}
+    class="relative isolate z-0 aspect-[4/5] w-full overflow-hidden rounded-2xl border border-slate-200 bg-sand-100 sm:aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[420px]"
+  >
+    <p data-map-placeholder class="absolute inset-0 grid place-items-center p-6 text-center text-sm text-slate-600">
+      Loading map…
+    </p>
+    <noscript>
+      <p class="absolute inset-0 grid place-items-center bg-sand-100 p-6 text-center text-sm text-slate-700">
+        The interactive map needs JavaScript. All places are listed below.
+      </p>
+    </noscript>
+  </div>
+</section>
+
+<script>
+  type Payload = {
+    boundary: GeoJSON.FeatureCollection;
+    spots: { name: string; lat: number; lng: number }[];
+    boundaryCredit: string;
+  };
+
+  async function initMap(el: HTMLElement) {
+    const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+    const { boundary, spots, boundaryCredit } = JSON.parse(el.dataset.stateMap!) as Payload;
+
+    const map = L.map(el, { scrollWheelZoom: false, zoomSnap: 0.25 });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Boundary: ${boundaryCredit}`,
+    }).addTo(map);
+
+    const outline = L.geoJSON(boundary, {
+      style: { color: '#0f766e', weight: 2.5, fillColor: '#14b8a6', fillOpacity: 0.08 },
+      interactive: false,
+    }).addTo(map);
+
+    const bounds = outline.getBounds();
+    map.fitBounds(bounds, { padding: [12, 12] });
+    // Lock the view to the state so international borders never come into view.
+    map.setMinZoom(map.getZoom() - 0.5);
+    map.setMaxBounds(bounds.pad(0.35));
+
+    spots.forEach((spot, i) => {
+      const n = i + 1;
+      const marker = L.marker([spot.lat, spot.lng], {
+        title: `${n}. ${spot.name}`,
+        alt: `${n}. ${spot.name}`,
+        riseOnHover: true,
+        icon: L.divIcon({
+          className: '',
+          html: `<span class="spot-marker" aria-hidden="true">${n}</span>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+          popupAnchor: [0, -14],
+        }),
+      }).addTo(map);
+      const popup = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = spot.name;
+      const link = document.createElement('a');
+      link.href = `#spot-${n}`;
+      link.textContent = 'Read more';
+      popup.append(strong, document.createElement('br'), link);
+      marker.bindPopup(popup);
+    });
+    el.querySelector('[data-map-placeholder]')?.remove();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-state-map]').forEach((el) => {
+    // Load Leaflet only when the map is about to scroll into view.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          initMap(el).catch(() => {
+            const msg = el.querySelector('[data-map-placeholder]');
+            if (msg) msg.textContent = 'The map could not be loaded. All places are listed below.';
+          });
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+  });
+</script>

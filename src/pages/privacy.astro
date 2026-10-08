@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../site';
+---
+
+<BaseLayout title="Privacy" description="IndiaStates collects no personal data: no accounts, no cookies and no analytics. What third-party services see when you visit.">
+  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <h1 class="font-serif text-4xl font-semibold tracking-tight text-slate-900">Privacy</h1>
+    <div class="prose prose-slate mt-6 prose-a:text-accent-800">
+      <p>{SITE.name} is a static website. It has no accounts or forms, sets no cookies, and runs no analytics or advertising.</p>
+      <h2>What other services see</h2>
+      <ul>
+        <li>
+          <strong>Hosting.</strong> Like any web host, our hosting provider handles the request when you load a page, which includes your IP
+          address and browser details.
+        </li>
+        <li>
+          <strong>Map tiles.</strong> When a map loads, your browser fetches map images from the OpenStreetMap tile servers, which see your IP
+          address. See the <a href="https://osmfoundation.org/wiki/Privacy_Policy">OpenStreetMap Foundation privacy policy</a>.
+        </li>
+        <li>
+          <strong>Links.</strong> Links to other sites (sources, universities, photo pages) are covered by those sites' own policies.
+        </li>
+      </ul>
+      <p>If we ever start collecting personal data, this page will be updated first, in line with India's Digital Personal Data Protection Act, 2023.</p>
+    </div>
+  </div>
+</BaseLayout>

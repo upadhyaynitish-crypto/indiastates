@@ -1,0 +1,30 @@
+---
+import { SITE } from '../site';
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-16 border-t border-slate-200 bg-sand-50">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm text-slate-700 sm:px-6 md:grid-cols-[2fr_1fr]">
+    <div class="space-y-3">
+      <p class="font-serif text-base font-semibold text-slate-900">{SITE.name}</p>
+      <p class="max-w-prose"><strong class="font-semibold text-slate-900">Disclaimer:</strong> {SITE.disclaimer}</p>
+      <p class="max-w-prose">
+        Facts are drawn from the Census of India, government publications and other cited sources. Each page lists its sources.
+        Spotted an error? Use the “Suggest a correction” link on any page.
+      </p>
+      <p class="text-slate-600">
+        Text © {year} {SITE.name}, available under
+        <a class="underline underline-offset-2 hover:text-accent-800" href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license">CC BY-SA 4.0</a>.
+        Photos are credited individually.
+      </p>
+    </div>
+    <nav aria-label="Footer">
+      <ul class="space-y-2">
+        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/">All states &amp; union territories</a></li>
+        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/about">About &amp; editorial policy</a></li>
+        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/sources">Sources</a></li>
+        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/privacy">Privacy</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>

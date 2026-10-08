@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import ImageCredit from './ImageCredit.astro';
+import { spotTypeLabel } from '../lib/format';
+
+type Spot = CollectionEntry<'states'>['data']['tourist_spots'][number];
+interface Props {
+  spot: Spot;
+  number: number;
+}
+const { spot, number } = Astro.props;
+---
+
+<article id={`spot-${number}`} class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+  <figure class="relative">
+    {
+      spot.image ? (
+        <Image
+          src={spot.image.src}
+          alt={spot.image.alt}
+          widths={[400, 640, 960]}
+          sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
+          class="aspect-[3/2] w-full object-cover"
+        />
+      ) : (
+        <div class="grid aspect-[3/2] w-full place-items-center bg-gradient-to-br from-accent-50 to-sand-100 text-sm text-slate-600">
+          No photo yet
+        </div>
+      )
+    }
+    <span
+      class="absolute top-3 left-3 grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-accent-700 text-sm font-semibold text-white shadow"
+      aria-hidden="true">{number}</span
+    >
+    {
+      spot.image && (
+        <figcaption class="px-4 pt-2 text-[11px] leading-snug text-slate-600">
+          <ImageCredit {...spot.image} />
+        </figcaption>
+      )
+    }
+  </figure>
+  <div class="flex flex-1 flex-col gap-2 p-4 pt-3">
+    <p class="text-xs font-semibold tracking-wide text-accent-800 uppercase">{spotTypeLabel(spot.type)}</p>
+    <h3 class="font-serif text-lg leading-snug font-semibold text-slate-900">
+      <span class="sr-only">{number}. </span>{spot.name}
+    </h3>
+    <p class="text-[15px] leading-relaxed text-slate-700">{spot.description}</p>
+    <p class="mt-auto pt-2 text-sm text-slate-700">
+      <span class="font-semibold text-slate-900">Best time:</span>
+      {spot.best_time}
+    </p>
+  </div>
+</article>

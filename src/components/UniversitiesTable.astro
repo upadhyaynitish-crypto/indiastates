@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  name: string;
+  universities: CollectionEntry<'states'>['data']['universities'];
+}
+const { name, universities } = Astro.props;
+---
+
+<div class="not-prose my-6 overflow-x-auto rounded-xl border border-slate-200" tabindex="0" role="region" aria-label={`Universities in ${name} (scrollable table)`}>
+  <table class="w-full min-w-[540px] border-collapse text-left text-sm">
+    <caption class="sr-only">Selected universities and institutes in {name}</caption>
+    <thead class="bg-sand-50 text-xs tracking-wide text-slate-700 uppercase">
+      <tr>
+        <th scope="col" class="px-4 py-3 font-semibold">Institution</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Location</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Type</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-200">
+      {
+        universities.map((u) => (
+          <tr>
+            <th scope="row" class="px-4 py-3 font-medium text-slate-900">
+              <a href={u.website} class="text-accent-800 underline underline-offset-2 hover:text-accent-900">
+                {u.name}
+              </a>
+            </th>
+            <td class="px-4 py-3 text-slate-700">{u.city}</td>
+            <td class="px-4 py-3 text-slate-700">{u.type}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

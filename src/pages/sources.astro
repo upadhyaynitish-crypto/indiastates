@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const states = (await getCollection('states')).sort((a, b) => a.data.name.localeCompare(b.data.name));
+---
+
+<BaseLayout title="Sources" description="Every source used on IndiaStates, grouped by state and union territory, plus credits for maps and data.">
+  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <h1 class="font-serif text-4xl font-semibold tracking-tight text-slate-900">Sources</h1>
+    <p class="mt-4 text-lg text-slate-700">Every page lists its own sources. They are collected here in one place.</p>
+
+    <section aria-labelledby="site-wide" class="mt-10">
+      <h2 id="site-wide" class="font-serif text-2xl font-semibold text-slate-900">Maps and data</h2>
+      <ul class="mt-3 list-disc space-y-2 pl-5 text-slate-800">
+        <li>
+          Map tiles: <a class="text-accent-800 underline underline-offset-2" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> (ODbL).
+        </li>
+        <li>
+          State boundaries: <a class="text-accent-800 underline underline-offset-2" href="https://github.com/datameet/maps">DataMeet Community Maps Project</a>,
+          Survey of India / Census 2011 boundaries (CC BY 4.0).
+        </li>
+        <li>Map library: <a class="text-accent-800 underline underline-offset-2" href="https://leafletjs.com/">Leaflet</a> (BSD-2-Clause).</li>
+      </ul>
+    </section>
+
+    {
+      states.map(({ data }) => (
+        <section aria-labelledby={`src-${data.slug}`} class="mt-10">
+          <h2 id={`src-${data.slug}`} class="font-serif text-2xl font-semibold text-slate-900">
+            <a href={`/states/${data.slug}`} class="hover:text-accent-800">
+              {data.name}
+            </a>
+          </h2>
+          <ol class="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-800">
+            {data.sources.map((s) => (
+              <li>
+                <a href={s.url} class="text-accent-800 underline underline-offset-2 break-words">
+                  {s.title}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <h3 class="mt-4 text-sm font-semibold text-slate-900">Photos</h3>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+            {[data.hero_image, ...data.tourist_spots.flatMap((s) => (s.image ? [s.image] : []))]
+              .filter((img, i, all) => all.findIndex((o) => o.source_url === img.source_url) === i)
+              .map((img) => (
+                <li>
+                  <a href={img.source_url} class="underline underline-offset-2">
+                    {img.credit}
+                  </a>
+                  , {img.license}
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

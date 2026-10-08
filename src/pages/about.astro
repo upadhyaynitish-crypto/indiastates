@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, correctionLink } from '../site';
+---
+
+<BaseLayout title="About" description="What IndiaStates is, how its pages are researched and sourced, and how to report a mistake.">
+  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <h1 class="font-serif text-4xl font-semibold tracking-tight text-slate-900">About {SITE.name}</h1>
+    <div class="prose prose-slate mt-6 prose-a:text-accent-800">
+      <p>
+        {SITE.name} is a free guide to India's 28 states and 8 union territories, written for travellers, students and anyone curious about the
+        country. Each page follows the same layout: an overview, history, geography, economy, culture, food, places to visit, universities and
+        how to get there.
+      </p>
+      <p><strong>{SITE.disclaimer}</strong> It is not an official source, and it does not use government emblems or logos.</p>
+
+      <h2>How pages are written</h2>
+      <ul>
+        <li>
+          <strong>Every fact has a source.</strong> Statistics come from the Census of India, data.gov.in, the Ministry of Statistics (MoSPI) or
+          state government websites, and always show the year they refer to.
+        </li>
+        <li><strong>Nothing is made up.</strong> If something can't be sourced, it is left out or listed under “Still being checked”.</li>
+        <li>
+          <strong>Original writing.</strong> Text is written for this site. Where Wikipedia is used as a reference, it is credited under its
+          CC BY-SA licence.
+        </li>
+        <li><strong>Neutral tone.</strong> Politics, religion and disputes are described factually, without taking sides.</li>
+        <li>
+          <strong>Credited photos.</strong> Images come only from Wikimedia Commons, Unsplash or our own photography, and each one is credited with its
+          licence.
+        </li>
+      </ul>
+
+      <h2>Maps</h2>
+      <p>
+        State maps use <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> background tiles. State boundaries come from data based
+        on Survey of India and Census of India boundaries. Each map is locked to the state it shows.
+      </p>
+
+      <h2 id="corrections">Corrections</h2>
+      <p>
+        Found a mistake or an outdated figure? <a href={correctionLink('General')}>Suggest a correction</a>, ideally with a link to an official
+        source. Every state page also has its own correction link next to its sources.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

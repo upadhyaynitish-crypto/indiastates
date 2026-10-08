@@ -1,0 +1,200 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QuickFacts from '../../components/QuickFacts.astro';
+import MapView from '../../components/MapView.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import SpotCard from '../../components/SpotCard.astro';
+import UniversitiesTable from '../../components/UniversitiesTable.astro';
+import SourceList from '../../components/SourceList.astro';
+import StateNav from '../../components/StateNav.astro';
+import ImageCredit from '../../components/ImageCredit.astro';
+import { splitSections } from '../../lib/sections';
+import { SITE } from '../../site';
+
+export async function getStaticPaths() {
+  const states = (await getCollection('states')).sort((a, b) => a.data.name.localeCompare(b.data.name));
+  return states.map((entry, i) => ({
+    params: { slug: entry.data.slug },
+    props: { entry, prev: states[i - 1], next: states[i + 1], published: states.map((s) => s.data.slug) },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'states'>;
+  prev?: CollectionEntry<'states'>;
+  next?: CollectionEntry<'states'>;
+  published: string[];
+}
+
+const { entry, prev, next, published } = Astro.props;
+const state = entry.data;
+
+// Boundary GeoJSON lives in src/data/geo/<slug>.geojson.
+const geoFiles = import.meta.glob<string>('../../data/geo/*.geojson', { query: '?raw', import: 'default', eager: true });
+const geoRaw = geoFiles[`../../data/geo/${state.slug}.geojson`];
+if (!geoRaw) throw new Error(`Missing boundary file src/data/geo/${state.slug}.geojson`);
+const boundary = JSON.parse(geoRaw);
+const boundaryCredit: string = boundary.features[0]?.properties?.attribution ?? 'DataMeet (CC BY 4.0)';
+
+const { intro, sections } = splitSections(entry.rendered?.html ?? '');
+if (intro.trim()) throw new Error(`${entry.id}: content before the first "##" heading is not shown; move it under "## Overview".`);
+
+const toc = [
+  ...sections.map((s) => ({ id: s.id, label: s.headingHtml.replace(/<[^>]+>/g, '').replace(/&#x26;|&amp;/g, '&') })),
+  { id: 'sources', label: 'Sources' },
+];
+
+const og = await getImage({ src: state.hero_image.src, width: 1200, height: 630, fit: 'cover', format: 'jpeg', quality: 80 });
+const pageUrl = new URL(`/states/${state.slug}`, Astro.site).href;
+const kindLabel = state.type === 'state' ? 'State' : 'Union territory';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name: state.name,
+    description: state.description,
+    url: pageUrl,
+    image: new URL(og.src, Astro.site).href,
+    geo: { '@type': 'GeoCoordinates', latitude: state.coordinates.lat, longitude: state.coordinates.lng },
+    containedInPlace: { '@type': 'Country', name: 'India' },
+    includesAttraction: state.tourist_spots.map((s) => ({
+      '@type': 'TouristAttraction',
+      name: s.name,
+      description: s.description,
+      geo: { '@type': 'GeoCoordinates', latitude: s.lat, longitude: s.lng },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'States & UTs', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: state.name, item: pageUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={`${state.name}: Places to Visit, Culture, Food & History`}
+  description={state.description}
+  ogImage={og.src}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <!-- 1. Hero -->
+  <header class="relative isolate overflow-hidden bg-slate-900">
+    <Image
+      src={state.hero_image.src}
+      alt={state.hero_image.alt}
+      widths={[640, 960, 1280, 1920]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/85 via-slate-950/45 to-slate-950/10"></div>
+    <div class="mx-auto flex min-h-[340px] max-w-6xl flex-col justify-end px-4 pt-24 pb-8 sm:min-h-[420px] sm:px-6 sm:pb-10">
+      <nav aria-label="Breadcrumb" class="text-sm text-white/85">
+        <ol class="flex items-center gap-2">
+          <li><a href="/" class="underline-offset-2 hover:underline">States &amp; UTs</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{state.name}</li>
+        </ol>
+      </nav>
+      <p class="mt-4 text-xs font-semibold tracking-[0.14em] text-white/85 uppercase">{kindLabel} · {state.region}</p>
+      <h1 class="mt-1 font-serif text-4xl font-semibold tracking-tight text-white sm:text-6xl">{state.name}</h1>
+      <p class="mt-3 max-w-2xl text-lg text-white/90 sm:text-xl">{state.tagline}</p>
+      <p class="mt-6 text-[11px] text-white/70">
+        <ImageCredit {...state.hero_image} />
+      </p>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-6xl px-4 sm:px-6" data-pagefind-body>
+    <!-- 2 & 3. Quick facts + map -->
+    <div class="relative z-10 -mt-6 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <QuickFacts state={state} />
+      <MapView
+        name={state.name}
+        boundary={boundary}
+        boundaryCredit={boundaryCredit}
+        spots={state.tourist_spots.map(({ name, lat, lng }) => ({ name, lat, lng }))}
+      />
+    </div>
+
+    <!-- 4. Table of contents + article -->
+    <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
+      <aside class="lg:order-none">
+        <TableOfContents items={toc} />
+      </aside>
+
+      <article class="min-w-0">
+        {
+          sections.map((s) => (
+            <section aria-labelledby={s.id} class="border-b border-slate-200 py-8 first:pt-0 last:border-0">
+              <h2 id={s.id} class="font-serif text-2xl font-semibold text-slate-900 sm:text-3xl" set:html={s.headingHtml} />
+              <div
+                class="prose prose-slate mt-4 max-w-[70ch] prose-a:text-accent-800 prose-strong:text-slate-900 prose-li:my-1"
+                set:html={s.bodyHtml}
+              />
+
+              {s.id === 'tourist-spots' && (
+                <div class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {state.tourist_spots.map((spot, i) => (
+                    <SpotCard spot={spot} number={i + 1} />
+                  ))}
+                </div>
+              )}
+
+              {s.id === 'culture-art-and-festivals' && state.festivals.length > 0 && (
+                <div class="mt-6">
+                  <h3 class="font-serif text-lg font-semibold text-slate-900">Major festivals</h3>
+                  <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+                    {state.festivals.map((f) => (
+                      <div class="rounded-xl bg-sand-50 p-4">
+                        <dt class="font-semibold text-slate-900">
+                          {f.name} <span class="ml-1 text-sm font-normal text-accent-800">{f.month}</span>
+                        </dt>
+                        <dd class="mt-1 text-sm leading-relaxed text-slate-700">{f.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              {s.id === 'food' && state.famous_food.length > 0 && (
+                <div class="mt-6">
+                  <h3 class="font-serif text-lg font-semibold text-slate-900">Dishes to try</h3>
+                  <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+                    {state.famous_food.map((f) => (
+                      <div class="rounded-xl border border-slate-200 p-4">
+                        <dt class="font-semibold text-slate-900">{f.name}</dt>
+                        <dd class="mt-1 text-sm leading-relaxed text-slate-700">{f.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              {s.id === 'education-and-universities' && (
+                <UniversitiesTable name={state.name} universities={state.universities} />
+              )}
+            </section>
+          ))
+        }
+
+        <!-- 7. Sources + correction link -->
+        <SourceList state={state} />
+
+        <!-- 8. Previous / next / nearby -->
+        <StateNav prev={prev} next={next} neighbours={state.neighbours} published={new Set(published)} />
+
+        <p class="mt-10 text-xs text-slate-600" data-pagefind-ignore>{SITE.disclaimer}</p>
+      </article>
+    </div>
+  </div>
+</BaseLayout>

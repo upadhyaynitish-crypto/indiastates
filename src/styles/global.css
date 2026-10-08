@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, Cambria, "Times New Roman", serif;
+
+  /* Teal accent: passes WCAG AA on white for text (accent-700 ≈ 5.5:1). */
+  --color-accent-50: #f0fdfa;
+  --color-accent-100: #ccfbf1;
+  --color-accent-600: #0d9488;
+  --color-accent-700: #0f766e;
+  --color-accent-800: #115e59;
+  --color-accent-900: #134e4a;
+
+  /* Warm neutral for section backgrounds. */
+  --color-sand-50: #fbf8f3;
+  --color-sand-100: #f4eee3;
+  --color-sand-200: #e8dfcf;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    @apply bg-white font-sans text-slate-800 antialiased;
+  }
+  /* Leave room for the sticky header when jumping to an anchor. */
+  [id] {
+    scroll-margin-top: 5rem;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 2px;
+  }
+}
+
+/* Numbered map markers (Leaflet divIcon), matching the spot cards. */
+.spot-marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--color-accent-700);
+  color: #fff;
+  font: 600 13px/1 var(--font-sans);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+.leaflet-marker-icon:focus-visible .spot-marker,
+.spot-marker:hover {
+  background: var(--color-accent-900);
+}

@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, Cambria, "Times New Roman", serif;
+/* Fonts are self-hosted by Astro's Fonts API (see astro.config.mjs). */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bricolage);
+}
 
+@theme {
   /* Teal accent: passes WCAG AA on white for text (accent-700 ≈ 5.5:1). */
   --color-accent-50: #f0fdfa;
   --color-accent-100: #ccfbf1;
@@ -31,6 +34,11 @@
   }
   body {
     @apply bg-white font-sans text-slate-800 antialiased;
+    font-feature-settings: "cv11", "ss01"; /* Inter: straight-sided 1, open digits */
+  }
+  .font-display {
+    letter-spacing: -0.025em;
+    font-optical-sizing: auto;
   }
   /* Leave room for the sticky header when jumping to an anchor. */
   [id] {

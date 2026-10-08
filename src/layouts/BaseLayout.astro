@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { Font } from 'astro:assets';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../site';
@@ -28,6 +29,8 @@ const ogImageUrl = ogImage ? new URL(ogImage, Astro.site).href : undefined;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Font cssVariable="--font-bricolage" preload />
+    <Font cssVariable="--font-inter" preload />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />

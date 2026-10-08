@@ -7,11 +7,11 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
 
 <BaseLayout title="Sources" description="Every source used on IndiaStates, grouped by state and union territory, plus credits for maps and data.">
   <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-    <h1 class="font-serif text-4xl font-semibold tracking-tight text-slate-900">Sources</h1>
+    <h1 class="font-display text-4xl font-semibold tracking-tight text-slate-900">Sources</h1>
     <p class="mt-4 text-lg text-slate-700">Every page lists its own sources. They are collected here in one place.</p>
 
     <section aria-labelledby="site-wide" class="mt-10">
-      <h2 id="site-wide" class="font-serif text-2xl font-semibold text-slate-900">Maps and data</h2>
+      <h2 id="site-wide" class="font-display text-2xl font-semibold text-slate-900">Maps and data</h2>
       <ul class="mt-3 list-disc space-y-2 pl-5 text-slate-800">
         <li>
           Map tiles: <a class="text-accent-800 underline underline-offset-2" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> (ODbL).
@@ -27,7 +27,7 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
     {
       states.map(({ data }) => (
         <section aria-labelledby={`src-${data.slug}`} class="mt-10">
-          <h2 id={`src-${data.slug}`} class="font-serif text-2xl font-semibold text-slate-900">
+          <h2 id={`src-${data.slug}`} class="font-display text-2xl font-semibold text-slate-900">
             <a href={`/states/${data.slug}`} class="hover:text-accent-800">
               {data.name}
             </a>

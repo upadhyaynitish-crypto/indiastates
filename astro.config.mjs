@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
@@ -11,6 +11,28 @@ export default defineConfig({
   // `file` + `never` gives clean URLs on Cloudflare Pages: /states/goa (no trailing slash, no .html).
   build: { format: 'file' },
   trailingSlash: 'never',
+
+  // Self-hosted at build time (no requests to Google or other font CDNs).
+  fonts: [
+    {
+      name: 'Bricolage Grotesque',
+      cssVariable: '--font-bricolage',
+      provider: fontProviders.fontsource(),
+      weights: [500, 600, 700, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Inter',
+      cssVariable: '--font-inter',
+      provider: fontProviders.fontsource(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+    },
+  ],
 
   vite: {
     plugins: [tailwindcss()],

@@ -12,43 +12,48 @@ interface Props {
 const { spot, number } = Astro.props;
 ---
 
-<article id={`spot-${number}`} class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-  <figure class="relative">
+<article id={`spot-${number}`} class="group flex h-full flex-col">
+  <figure class="relative overflow-hidden rounded-2xl bg-sand-100">
     {
       spot.image ? (
         <Image
           src={spot.image.src}
           alt={spot.image.alt}
           widths={[400, 640, 960]}
-          sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
-          class="aspect-[3/2] w-full object-cover"
+          sizes="(min-width: 1280px) 340px, (min-width: 640px) 45vw, 82vw"
+          class="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
         />
       ) : (
-        <div class="grid aspect-[3/2] w-full place-items-center bg-gradient-to-br from-accent-50 to-sand-100 text-sm text-slate-600">
+        <div class="grid aspect-[4/3] w-full place-items-center bg-gradient-to-br from-accent-50 to-sand-100 text-sm text-slate-600">
           No photo yet
         </div>
       )
     }
-    <span
-      class="absolute top-3 left-3 grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-accent-700 text-sm font-semibold text-white shadow"
-      aria-hidden="true">{number}</span
-    >
-    {
-      spot.image && (
-        <figcaption class="px-4 pt-2 text-[11px] leading-snug text-slate-600">
-          <ImageCredit {...spot.image} />
-        </figcaption>
-      )
-    }
+    <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3">
+      <span
+        class="grid h-8 w-8 place-items-center rounded-full bg-white/95 text-sm font-bold text-slate-900 shadow-sm"
+        aria-hidden="true">{number}</span
+      >
+      <span class="rounded-full bg-slate-900/75 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur">
+        {spotTypeLabel(spot.type)}
+      </span>
+    </div>
   </figure>
-  <div class="flex flex-1 flex-col gap-2 p-4 pt-3">
-    <p class="text-xs font-semibold tracking-wide text-accent-800 uppercase">{spotTypeLabel(spot.type)}</p>
-    <h3 class="font-display text-lg leading-snug font-semibold text-slate-900">
+  <div class="flex flex-1 flex-col pt-3">
+    <h3 class="font-display text-lg leading-snug font-bold text-slate-900">
       <span class="sr-only">{number}. </span>{spot.name}
     </h3>
-    <p class="text-[15px] leading-relaxed text-slate-700">{spot.description}</p>
-    <p class="mt-auto pt-2 text-sm text-slate-700">
-      <span class="font-semibold text-slate-900">Best time:</span>{' '}{spot.best_time}
+    <p class="mt-1 text-[15px] leading-relaxed text-slate-700">{spot.description}</p>
+    <p class="mt-auto flex items-center gap-1.5 pt-3 text-sm text-slate-700">
+      <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4 text-accent-700" fill="currentColor"><path d="M6 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm10 7H4v7h12V9Z"></path></svg>
+      <span><span class="font-semibold text-slate-900">Best time:</span>{' '}{spot.best_time}</span>
     </p>
+    {
+      spot.image && (
+        <p class="mt-2 text-[11px] leading-snug text-slate-500">
+          <ImageCredit {...spot.image} />
+        </p>
+      )
+    }
   </div>
 </article>

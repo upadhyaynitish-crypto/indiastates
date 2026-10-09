@@ -7,36 +7,40 @@ interface Props {
 }
 const { state } = Astro.props;
 
-const facts: { label: string; value: string; note?: string }[] = [
+const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+
+// Stat tiles: big value, small label, provenance underneath.
+const facts: { label: string; value: string; note?: string; wide?: boolean }[] = [
   { label: 'Capital', value: state.capital },
+  { label: 'Population', value: compact.format(state.population.value), note: `${formatNumber(state.population.value)} · Census ${state.population.year}` },
+  { label: 'Area', value: `${formatNumber(state.area_km2)} km²`, note: `${formatNumber(Math.round(state.area_km2 * 0.386102))} sq mi` },
+  { label: 'Literacy', value: `${state.literacy_rate.value}%`, note: `Census ${state.literacy_rate.year}` },
+  { label: state.type === 'state' ? 'Became a state' : 'Formed', value: formatDate(state.formed) },
+  { label: 'Region', value: state.region },
   {
     label: state.official_languages.length > 1 ? 'Official languages' : 'Official language',
     value: listJoin(state.official_languages),
     note: state.other_languages.length ? `Also spoken: ${listJoin(state.other_languages)}` : undefined,
+    wide: true,
   },
-  { label: 'Population', value: formatNumber(state.population.value), note: `Census ${state.population.year}` },
-  { label: 'Area', value: `${formatNumber(state.area_km2)} km²`, note: `${formatNumber(Math.round(state.area_km2 * 0.386102))} sq mi` },
-  { label: 'Literacy rate', value: `${state.literacy_rate.value}%`, note: `Census ${state.literacy_rate.year}` },
-  { label: state.type === 'state' ? 'Became a state' : 'Formed', value: formatDate(state.formed) },
-  { label: 'Region', value: state.region },
   ...(state.largest_city ? [{ label: 'Largest city', value: state.largest_city }] : []),
 ];
 ---
 
-<section aria-labelledby="quick-facts-title" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-  <h2 id="quick-facts-title" class="font-display text-xl font-semibold text-slate-900">Quick facts</h2>
-  <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-4">
+<section aria-labelledby="quick-facts-title" class="flex flex-col">
+  <div class="flex items-baseline justify-between gap-3">
+    <h2 id="quick-facts-title" class="font-display text-xl font-bold text-slate-900">At a glance</h2>
+    <a href="#sources" class="text-xs font-medium text-accent-800 underline underline-offset-2">Sources</a>
+  </div>
+  <dl class="mt-3 grid flex-1 grid-cols-2 gap-2.5">
     {
       facts.map((f) => (
-        <div class="min-w-0">
-          <dt class="text-xs font-semibold tracking-wide text-slate-600 uppercase">{f.label}</dt>
-          <dd class="mt-0.5 font-medium break-words text-slate-900">{f.value}</dd>
-          {f.note && <dd class="text-xs text-slate-600">{f.note}</dd>}
+        <div class:list={['flex min-w-0 flex-col rounded-2xl bg-sand-50 p-3.5 ring-1 ring-sand-200/70 sm:p-4', f.wide && 'col-span-2']}>
+          <dt class="text-[11px] font-semibold tracking-[0.08em] text-slate-600 uppercase">{f.label}</dt>
+          <dd class="mt-1 font-display text-[clamp(1.15rem,2.6vw,1.5rem)] leading-tight font-bold break-words text-slate-900">{f.value}</dd>
+          {f.note && <dd class="mt-1 text-xs text-slate-600">{f.note}</dd>}
         </div>
       ))
     }
   </dl>
-  <p class="mt-5 text-xs text-slate-600">
-    Figures are from the sources listed at the bottom of this page. <a href="#sources" class="font-medium text-accent-800 underline underline-offset-2">See sources</a>
-  </p>
 </section>

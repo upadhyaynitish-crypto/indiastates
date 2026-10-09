@@ -10,6 +10,8 @@ import UniversitiesTable from '../../components/UniversitiesTable.astro';
 import SourceList from '../../components/SourceList.astro';
 import StateNav from '../../components/StateNav.astro';
 import ImageCredit from '../../components/ImageCredit.astro';
+import TripPlanner from '../../components/TripPlanner.astro';
+import { formatNumber } from '../../lib/format';
 import { splitSections } from '../../lib/sections';
 import { SITE } from '../../site';
 
@@ -85,38 +87,62 @@ const jsonLd = [
   ogType="article"
   jsonLd={jsonLd}
 >
-  <!-- 1. Hero -->
-  <header class="relative isolate overflow-hidden bg-slate-900">
-    <Image
-      src={state.hero_image.src}
-      alt={state.hero_image.alt}
-      widths={[640, 960, 1280, 1920]}
-      sizes="100vw"
-      loading="eager"
-      fetchpriority="high"
-      class="absolute inset-0 -z-10 h-full w-full object-cover"
-    />
-    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/15"></div>
-    <div class="mx-auto flex min-h-[340px] max-w-6xl flex-col justify-end px-4 pt-24 pb-8 sm:min-h-[420px] sm:px-6 sm:pb-10">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/85">
-        <ol class="flex items-center gap-2">
-          <li><a href="/" class="underline-offset-2 hover:underline">States &amp; UTs</a></li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page">{state.name}</li>
-        </ol>
-      </nav>
-      <p class="mt-4 text-xs font-semibold tracking-[0.14em] text-white/85 uppercase">{kindLabel} · {state.region}</p>
-      <h1 class="mt-1 font-display text-[clamp(2.75rem,10vw,5.5rem)] leading-[0.95] font-bold tracking-[-0.035em] text-white">{state.name}</h1>
-      <p class="mt-4 max-w-2xl text-[clamp(1.05rem,2.4vw,1.3rem)] leading-relaxed text-pretty text-white/90">{state.tagline}</p>
-      <p class="mt-6 text-[11px] text-white/70">
-        <ImageCredit {...state.hero_image} />
-      </p>
-    </div>
-  </header>
+  <!-- Reading progress (CSS scroll-driven animation; ignored where unsupported). -->
+  <div aria-hidden="true" class="reading-progress"></div>
+
+  <div class="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-6">
+    <nav aria-label="Breadcrumb" class="text-sm text-slate-600">
+      <ol class="flex items-center gap-2">
+        <li><a href="/" class="hover:text-slate-900 hover:underline">States &amp; UTs</a></li>
+        <li aria-hidden="true" class="text-slate-400">/</li>
+        <li aria-current="page" class="font-medium text-slate-900">{state.name}</li>
+      </ol>
+    </nav>
+
+    <!-- 1. Hero -->
+    <header class="relative isolate mt-3 overflow-hidden rounded-[28px] bg-slate-900 sm:mt-4">
+      <Image
+        src={state.hero_image.src}
+        alt={state.hero_image.alt}
+        widths={[640, 960, 1280, 1920]}
+        sizes="(min-width: 1152px) 1104px, 100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+      />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-slate-950/5"></div>
+      <div class="flex min-h-[460px] flex-col justify-end p-5 sm:min-h-[520px] sm:p-8 lg:min-h-[560px] lg:p-10">
+        <p class="inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25 backdrop-blur">
+          {kindLabel} · {state.region}
+        </p>
+        <h1 class="mt-3 font-display text-[clamp(3rem,11vw,6.5rem)] leading-[0.92] font-bold tracking-[-0.04em] text-white">{state.name}</h1>
+        <p class="mt-4 max-w-2xl text-[clamp(1.05rem,2.4vw,1.3rem)] leading-relaxed text-pretty text-white/90">{state.tagline}</p>
+
+        <dl class="mt-6 flex flex-wrap gap-2">
+          {
+            [
+              ['Capital', state.capital],
+              [`Population (${state.population.year})`, formatNumber(state.population.value)],
+              ['Area', `${formatNumber(state.area_km2)} km²`],
+            ].map(([label, value]) => (
+              <div class="rounded-2xl bg-white/12 px-3.5 py-2 ring-1 ring-white/20 backdrop-blur-md">
+                <dt class="text-[10px] font-semibold tracking-[0.1em] text-white/70 uppercase">{label}</dt>
+                <dd class="font-display text-base font-bold text-white sm:text-lg">{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-5 text-[11px] text-white/65">
+          <ImageCredit {...state.hero_image} />
+        </p>
+      </div>
+    </header>
+  </div>
 
   <div class="mx-auto max-w-6xl px-4 sm:px-6" data-pagefind-body>
-    <!-- 2 & 3. Quick facts + map -->
-    <div class="relative z-10 -mt-6 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <!-- 2 & 3. At a glance + map -->
+    <div class="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <QuickFacts state={state} />
       <MapView
         name={state.name}
@@ -126,57 +152,68 @@ const jsonLd = [
       />
     </div>
 
-    <!-- 4. Table of contents + article -->
-    <div class="mt-10 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
-      <aside class="lg:order-none">
+    <TripPlanner state={state} />
+
+    <!-- 4. Section navigation + article -->
+    <div class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-x-12 lg:mt-12 lg:grid-cols-[220px_minmax(0,1fr)]">
+      <!-- `contents` below lg lets the chip bar stick against the whole article. -->
+      <aside class="contents lg:block">
         <TableOfContents items={toc} />
       </aside>
 
       <article class="min-w-0">
         {
-          sections.map((s) => (
-            <section aria-labelledby={s.id} class="border-b border-slate-200 py-8 first:pt-0 last:border-0">
-              <h2 id={s.id} class="font-display text-[clamp(1.6rem,4vw,2.25rem)] leading-tight font-bold text-slate-900" set:html={s.headingHtml} />
+          sections.map((s, i) => (
+            <section aria-labelledby={s.id} class="border-b border-slate-200 py-10 last:border-0 lg:first:pt-0">
+              <p class="font-mono text-xs text-slate-500" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </p>
+              <h2 id={s.id} class="mt-1 font-display text-[clamp(1.75rem,4.5vw,2.5rem)] leading-[1.05] font-bold text-slate-900" set:html={s.headingHtml} />
               <div
-                class="prose prose-slate mt-4 max-w-[70ch] prose-a:text-accent-800 prose-strong:text-slate-900 prose-li:my-1"
+                class="prose prose-slate mt-5 max-w-[68ch] text-[17px] prose-a:text-accent-800 prose-strong:text-slate-900 prose-li:my-1"
                 set:html={s.bodyHtml}
               />
 
               {s.id === 'tourist-spots' && (
-                <div class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {state.tourist_spots.map((spot, i) => (
-                    <SpotCard spot={spot} number={i + 1} />
+                <ol class="relative -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 sm:scroll-px-0 gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-5 sm:gap-y-8 sm:overflow-visible sm:px-0 xl:grid-cols-3">
+                  {state.tourist_spots.map((spot, n) => (
+                    <li class="w-[82%] shrink-0 snap-start sm:w-auto">
+                      <SpotCard spot={spot} number={n + 1} />
+                    </li>
                   ))}
-                </div>
+                </ol>
               )}
 
               {s.id === 'culture-art-and-festivals' && state.festivals.length > 0 && (
-                <div class="mt-6">
-                  <h3 class="font-display text-lg font-semibold text-slate-900">Major festivals</h3>
-                  <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+                <div class="mt-8">
+                  <h3 class="font-display text-xl font-bold text-slate-900">Festival calendar</h3>
+                  <ol class="mt-4 grid gap-3 sm:grid-cols-2">
                     {state.festivals.map((f) => (
-                      <div class="rounded-xl bg-sand-50 p-4">
-                        <dt class="font-semibold text-slate-900">
-                          {f.name} <span class="ml-1 text-sm font-normal text-accent-800">{f.month}</span>
-                        </dt>
-                        <dd class="mt-1 text-sm leading-relaxed text-slate-700">{f.description}</dd>
-                      </div>
+                      <li class="flex gap-4 rounded-2xl bg-sand-50 p-4 ring-1 ring-sand-200/70">
+                        <span class="h-fit shrink-0 rounded-xl bg-white px-2.5 py-1.5 text-center text-xs leading-tight font-semibold text-accent-800 ring-1 ring-sand-200">
+                          {f.month}
+                        </span>
+                        <span>
+                          <span class="block font-semibold text-slate-900">{f.name}</span>
+                          <span class="mt-0.5 block text-sm leading-relaxed text-slate-700">{f.description}</span>
+                        </span>
+                      </li>
                     ))}
-                  </dl>
+                  </ol>
                 </div>
               )}
 
               {s.id === 'food' && state.famous_food.length > 0 && (
-                <div class="mt-6">
-                  <h3 class="font-display text-lg font-semibold text-slate-900">Dishes to try</h3>
-                  <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+                <div class="mt-8">
+                  <h3 class="font-display text-xl font-bold text-slate-900">Dishes to try</h3>
+                  <ul class="mt-4 grid gap-3 sm:grid-cols-2">
                     {state.famous_food.map((f) => (
-                      <div class="rounded-xl border border-slate-200 p-4">
-                        <dt class="font-semibold text-slate-900">{f.name}</dt>
-                        <dd class="mt-1 text-sm leading-relaxed text-slate-700">{f.description}</dd>
-                      </div>
+                      <li class="rounded-2xl border border-slate-200 p-4 transition hover:border-slate-300 hover:shadow-sm">
+                        <span class="block font-semibold text-slate-900">{f.name}</span>
+                        <span class="mt-1 block text-sm leading-relaxed text-slate-700">{f.description}</span>
+                      </li>
                     ))}
-                  </dl>
+                  </ul>
                 </div>
               )}
 

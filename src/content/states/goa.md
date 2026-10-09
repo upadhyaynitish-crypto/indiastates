@@ -14,6 +14,12 @@ literacy_rate: { value: 88.7, year: 2011 }
 region: West India
 neighbours: [Maharashtra, Karnataka]
 coordinates: { lat: 15.4989, lng: 73.8278 }
+best_time_to_visit:
+  months: October to March
+  note: The dry season, with sunny days and calm seas. June to September is the monsoon, when the state is greenest and hotels offer discounts.
+airports:
+  - { name: Manohar International Airport, code: GOX, city: "Mopa, North Goa" }
+  - { name: Goa International Airport, code: GOI, city: "Dabolim, near Vasco da Gama" }
 hero_image:
   src: ../../assets/states/goa/palolem.jpg
   alt: "Palolem Beach in South Goa: a long sandy shore lined with coconut palms, with families playing at the water's edge"
@@ -161,6 +167,9 @@ sources:
   - title: "Weather — Department of Tourism, Government of Goa"
     url: https://goatourism.gov.in/weather/
     supports: "Monsoon season June to September"
+  - title: "Manohar International Airport and Dabolim Airport — Wikipedia (CC BY-SA 4.0)"
+    url: https://en.wikipedia.org/wiki/Manohar_International_Airport
+    supports: "IATA codes GOX (Mopa) and GOI (Dabolim)"
   - title: "Konkan Railway Corporation"
     url: https://konkanrailway.com/
     supports: "Rail access along the coast"
@@ -210,7 +219,7 @@ sources:
     url: https://www.bits-pilani.ac.in/goa/
 needs_verification:
   - "Per-capita income (Economy): the 2023–24 per-capita NSDP figure of ₹3,57,611 comes from a Lok Sabha written reply as reported in the press. Check it against the MoSPI release before launch."
-  - "Best time to visit (tourist spots): editorial guidance based on the June–September monsoon. No official per-site source."
+  - "Best time to visit (state and tourist spots): editorial guidance based on the June–September monsoon. No official per-site source."
   - "IIT Goa location: listed at its temporary campus in Farmagudi, Ponda. Confirm the current campus."
   - "Largest city: left out until Census 2011 town tables confirm it (Vasco da Gama and Margao are both cited elsewhere)."
 last_updated: 2026-10-08

@@ -67,3 +67,31 @@
 .spot-marker:hover {
   background: var(--color-accent-900);
 }
+
+/* Thin reading-progress bar under the header (scroll-driven, no JS). */
+.reading-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reading-progress {
+      display: block;
+      position: fixed;
+      top: 3.5rem;
+      left: 0;
+      right: 0;
+      z-index: 1101;
+      height: 3px;
+      background: linear-gradient(to right, var(--color-accent-700), #10b981);
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: reading-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+@keyframes reading-progress {
+  to {
+    transform: scaleX(1);
+  }
+}

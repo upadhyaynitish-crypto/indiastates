@@ -48,6 +48,17 @@ const states = defineCollection({
       ]),
       neighbours: z.array(z.string()).default([]),
       coordinates: z.object({ lat: z.number(), lng: z.number() }),
+      /** State-level travel planning; shown in the "Plan your trip" panel. */
+      best_time_to_visit: z.object({ months: z.string(), note: z.string() }).optional(),
+      airports: z
+        .array(
+          z.object({
+            name: z.string(),
+            code: z.string().regex(/^[A-Z]{3}$/, 'IATA code, e.g. BOM'),
+            city: z.string(),
+          }),
+        )
+        .default([]),
       hero_image: imageMeta,
       tourist_spots: z
         .array(

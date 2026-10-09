@@ -1,30 +1,116 @@
 ---
-import { SITE } from '../site';
+import { getCollection } from 'astro:content';
+import Logo from './Logo.astro';
+import { SITE, correctionLink } from '../site';
+
 const year = new Date().getFullYear();
+
+// "Explore by region" columns are built from the guides that exist, so they
+// grow automatically as states are published.
+const REGION_ORDER = ['North India', 'West India', 'Central India', 'East India', 'Northeast India', 'South India'] as const;
+const states = (await getCollection('states')).map((e) => e.data).sort((a, b) => a.name.localeCompare(b.name));
+const regions = REGION_ORDER.map((region) => ({ region, states: states.filter((s) => s.region === region) })).filter(
+  (r) => r.states.length > 0,
+);
+const remaining = SITE.totalRegions - states.length;
+
+const linkClass = 'inline-flex min-h-9 items-center text-slate-300 hover:text-white hover:underline underline-offset-4';
 ---
 
-<footer class="mt-16 border-t border-slate-200 bg-sand-50">
-  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm text-slate-700 sm:px-6 md:grid-cols-[2fr_1fr]">
-    <div class="space-y-3">
-      <p class="font-display text-base font-semibold text-slate-900">{SITE.name}</p>
-      <p class="max-w-prose"><strong class="font-semibold text-slate-900">Disclaimer:</strong> {SITE.disclaimer}</p>
-      <p class="max-w-prose">
-        Facts are drawn from the Census of India, government publications and other cited sources. Each page lists its sources.
-        Spotted an error? Use the “Suggest a correction” link on any page.
-      </p>
-      <p class="text-slate-600">
-        Text © {year} {SITE.name}, available under
-        <a class="underline underline-offset-2 hover:text-accent-800" href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license">CC BY-SA 4.0</a>.
-        Photos are credited individually.
-      </p>
+<footer class="mt-20 bg-slate-950 text-slate-300">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <!-- Brand + call to action -->
+    <div class="flex flex-col gap-6 border-b border-white/10 py-10 md:flex-row md:items-end md:justify-between">
+      <div class="max-w-md">
+        <Logo tone="light" />
+        <p class="mt-3 text-sm leading-relaxed text-slate-400">
+          {SITE.tagline}. Every fact is sourced, every photo is credited, and it's free to read.
+        </p>
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <a
+          href="/search"
+          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-slate-900 hover:bg-teal-100"
+        >
+          <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M8.5 3a5.5 5.5 0 1 0 3.4 9.83l3.64 3.63a1 1 0 0 0 1.41-1.41l-3.63-3.64A5.5 5.5 0 0 0 8.5 3Zm-3.5 5.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z"></path></svg>
+          Search the guides
+        </a>
+        <a
+          href={correctionLink('General')}
+          class="inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white ring-1 ring-white/25 hover:bg-white/10"
+        >
+          Suggest a correction
+        </a>
+      </div>
     </div>
-    <nav aria-label="Footer">
-      <ul class="space-y-2">
-        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/">All states &amp; union territories</a></li>
-        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/about">About &amp; editorial policy</a></li>
-        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/sources">Sources</a></li>
-        <li><a class="underline-offset-2 hover:text-accent-800 hover:underline" href="/privacy">Privacy</a></li>
-      </ul>
-    </nav>
+
+    <!-- Link columns -->
+    <div class="grid grid-cols-2 gap-x-6 gap-y-10 py-10 sm:grid-cols-3 lg:grid-cols-5">
+      <nav aria-labelledby="footer-regions" class="col-span-2 sm:col-span-3 lg:col-span-3">
+        <h2 id="footer-regions" class="text-[11px] font-semibold tracking-[0.12em] text-teal-300 uppercase">Explore by region</h2>
+        <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+          {
+            regions.map(({ region, states: list }) => (
+              <div>
+                <h3 class="text-sm font-semibold text-white">{region}</h3>
+                <ul class="mt-2 space-y-0.5 text-sm">
+                  {list.map((s) => (
+                    <li>
+                      <a href={`/states/${s.slug}`} class={linkClass}>
+                        {s.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+        {
+          remaining > 0 && (
+            <p class="mt-5 text-xs text-slate-400">
+              {states.length} of {SITE.totalRegions} guides published · {remaining} more on the way
+            </p>
+          )
+        }
+      </nav>
+
+      <nav aria-labelledby="footer-plan">
+        <h2 id="footer-plan" class="text-[11px] font-semibold tracking-[0.12em] text-teal-300 uppercase">Plan</h2>
+        <ul class="mt-4 space-y-0.5 text-sm">
+          <li><a href="/" class={linkClass}>All states &amp; UTs</a></li>
+          <li><a href="/search" class={linkClass}>Search</a></li>
+          <li><a href="/sources" class={linkClass}>Sources &amp; data</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="footer-about">
+        <h2 id="footer-about" class="text-[11px] font-semibold tracking-[0.12em] text-teal-300 uppercase">About</h2>
+        <ul class="mt-4 space-y-0.5 text-sm">
+          <li><a href="/about" class={linkClass}>About &amp; editorial policy</a></li>
+          <li><a href="/about#corrections" class={linkClass}>Corrections</a></li>
+          <li><a href="/privacy" class={linkClass}>Privacy</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Legal bar -->
+    <div class="flex flex-col gap-4 border-t border-white/10 py-6 text-xs leading-relaxed text-slate-400 md:flex-row md:items-start md:justify-between">
+      <div class="max-w-2xl space-y-1.5">
+        <p><strong class="font-semibold text-slate-200">Disclaimer:</strong> {SITE.disclaimer}</p>
+        <p>
+          Text © {year} {SITE.name}, available under{' '}
+          <a class="text-slate-300 underline underline-offset-2 hover:text-white" href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license">CC BY-SA 4.0</a>.
+          Photos are credited on each page. Map data ©{' '}
+          <a class="text-slate-300 underline underline-offset-2 hover:text-white" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>{' '}contributors;
+          boundaries by{' '}
+          <a class="text-slate-300 underline underline-offset-2 hover:text-white" href="https://github.com/datameet/maps">DataMeet</a>.
+        </p>
+      </div>
+      <a href="#main" class="inline-flex min-h-9 shrink-0 items-center gap-1.5 text-slate-300 hover:text-white">
+        Back to top
+        <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M10 17a1 1 0 0 1-1-1V6.41L5.7 9.7a1 1 0 0 1-1.4-1.42l5-5a1 1 0 0 1 1.4 0l5 5a1 1 0 1 1-1.4 1.42L11 6.4V16a1 1 0 0 1-1 1Z"></path></svg>
+      </a>
+    </div>
   </div>
 </footer>

@@ -13,7 +13,6 @@ import ImageCredit from '../../components/ImageCredit.astro';
 import TripPlanner from '../../components/TripPlanner.astro';
 import { formatNumber } from '../../lib/format';
 import { splitSections } from '../../lib/sections';
-import { SITE } from '../../site';
 
 export async function getStaticPaths() {
   const states = (await getCollection('states')).sort((a, b) => a.data.name.localeCompare(b.data.name));
@@ -232,7 +231,6 @@ const jsonLd = {
         <!-- 8. Previous / next / nearby -->
         <StateNav prev={prev} next={next} neighbours={state.neighbours} published={new Set(published)} />
 
-        <p class="mt-10 text-xs text-slate-600" data-pagefind-ignore>{SITE.disclaimer}</p>
       </article>
     </div>
   </div>

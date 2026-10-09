@@ -1,0 +1,25 @@
+---
+import { SITE } from '../site';
+
+interface Props {
+  /** Colour of the wordmark; the mark itself is always teal. */
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { tone = 'dark', class: className } = Astro.props;
+---
+
+<a
+  href="/"
+  class:list={[
+    'flex shrink-0 items-center gap-2 font-display text-lg font-bold',
+    tone === 'dark' ? 'text-slate-900' : 'text-white',
+    className,
+  ]}
+>
+  <svg aria-hidden="true" viewBox="0 0 32 32" class="h-7 w-7">
+    <rect width="32" height="32" rx="8" fill="#0f766e"></rect>
+    <path d="M16 7c-3.9 0-7 3-7 6.8 0 4.9 7 11.2 7 11.2s7-6.3 7-11.2C23 10 19.9 7 16 7Zm0 9.4a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z" fill="#fff"></path>
+  </svg>
+  {SITE.name}
+</a>

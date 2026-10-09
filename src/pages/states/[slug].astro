@@ -52,9 +52,11 @@ const og = await getImage({ src: state.hero_image.src, width: 1200, height: 630,
 const pageUrl = new URL(`/states/${state.slug}`, Astro.site).href;
 const kindLabel = state.type === 'state' ? 'State' : 'Union territory';
 
-const jsonLd = [
+// One @graph object (rather than a bare array) is the most widely supported JSON-LD shape.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
   {
-    '@context': 'https://schema.org',
     '@type': 'TouristDestination',
     name: state.name,
     description: state.description,
@@ -70,14 +72,14 @@ const jsonLd = [
     })),
   },
   {
-    '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'States & UTs', item: new URL('/', Astro.site).href },
       { '@type': 'ListItem', position: 2, name: state.name, item: pageUrl },
     ],
   },
-];
+  ],
+};
 ---
 
 <BaseLayout

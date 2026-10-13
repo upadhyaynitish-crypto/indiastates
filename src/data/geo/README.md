@@ -7,6 +7,7 @@ One GeoJSON `FeatureCollection` per state/UT, named `<slug>.geojson`.
 | `karnataka.geojson`, `gujarat.geojson`, `rajasthan.geojson` | Same DataMeet layer, simplified (tolerance 0.003–0.004°), 4 decimals | CC BY 4.0 |
 | `kerala.geojson` | Same DataMeet layer, simplified (tolerance 0.0015°), 4 decimals | CC BY 4.0 |
 | `tamil-nadu.geojson`, `andhra-pradesh.geojson`, `telangana.geojson`, `madhya-pradesh.geojson` | Same DataMeet layer, simplified (tolerance 0.003–0.004°), 4 decimals | CC BY 4.0 |
+| `uttar-pradesh.geojson`, `bihar.geojson` | Same DataMeet layer, simplified (tolerance 0.003–0.004°), 4 decimals | CC BY 4.0 |
 | `maharashtra.geojson` | Same DataMeet layer, simplified (tolerance 0.003°) and truncated to 4 decimals | CC BY 4.0 |
 | `goa.geojson` | [DataMeet — Survey of India / Census 2011 state boundaries](https://github.com/datameet/maps/tree/master/Survey-of-India-Index-Maps/Boundaries) (`India-States.shp`), simplified (tolerance 0.0005°) and truncated to 5 decimals | CC BY 4.0 |
 

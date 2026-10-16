@@ -3,8 +3,56 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../site';
+import ImageCredit from '../components/ImageCredit.astro';
+import { getPlaces } from '../lib/places';
+import { INTERESTS } from '../lib/format';
 
 const states = (await getCollection('states')).sort((a, b) => a.data.name.localeCompare(b.data.name));
+const places = await getPlaces();
+const sourceCount = new Set(states.flatMap((s) => s.data.sources.map((src) => src.url))).size;
+
+// One photo per interest tile; falls back to the first place of that type if a pick is renamed.
+const FEATURED: Record<string, string> = {
+  heritage: 'Hampi',
+  fort: 'Mehrangarh, Jodhpur',
+  religious: 'Meenakshi Temple, Madurai',
+  wildlife: 'Kaziranga National Park',
+  nature: 'Backwaters of Alappuzha and Kumarakom',
+  'hill-station': 'Munnar',
+  waterfall: 'Chitrakote Falls',
+  beach: 'Palolem Beach',
+};
+const tiles = INTERESTS.filter((i) => FEATURED[i.type])
+  .map((i) => {
+    const ofType = places.filter((p) => p.type === i.type && p.image);
+    const pick = ofType.find((p) => p.name === FEATURED[i.type]) ?? ofType[0];
+    return { ...i, count: places.filter((p) => p.type === i.type).length, image: pick?.image };
+  })
+  .filter((t) => t.image);
+
+const pillars = [
+  {
+    title: 'Plan by interest and month',
+    body: `Filter ${places.length} places by what you love, from forts and wildlife to waterfalls and beaches, and see which are at their best when you’re going.`,
+    href: '/explore',
+    cta: 'Open the trip finder',
+    icon: 'M3 5a1 1 0 0 1 1-1h12a1 1 0 0 1 .8 1.6L12 12v4a1 1 0 0 1-.55.9l-2 1A1 1 0 0 1 8 17v-5L3.2 5.6A1 1 0 0 1 3 5Z',
+  },
+  {
+    title: 'Every fact has a source',
+    body: `Figures come from the Census of India and other official sources, with the year. Our guides cite ${sourceCount} sources, and anything not yet confirmed is marked “still being checked”, not guessed.`,
+    href: '/sources',
+    cta: 'How we source facts',
+    icon: 'M10 1.5 3 4.2v5.1c0 4.3 2.9 8 7 9.2 4.1-1.2 7-4.9 7-9.2V4.2L10 1.5Zm3.7 6.2a1 1 0 0 0-1.4-1.4L9 9.6 7.7 8.3a1 1 0 0 0-1.4 1.4l2 2a1 1 0 0 0 1.4 0l4-4Z',
+  },
+  {
+    title: 'One clear format, every state',
+    body: 'A map, the best time to go, airports, top sights and local food, in the same order on every page. Read a state in about five minutes, then compare it with the next.',
+    href: '#guides-title',
+    cta: 'Browse the guides',
+    icon: 'M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3H3V4Zm0 5h6v8H4a1 1 0 0 1-1-1V9Zm8 0h6v7a1 1 0 0 1-1 1h-5V9Z',
+  },
+];
 ---
 
 <BaseLayout
@@ -35,28 +83,28 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
         <span class="block w-fit bg-gradient-to-r from-accent-700 via-teal-600 to-emerald-600 bg-clip-text text-transparent">one state at a time.</span>
       </h1>
       <p class="mt-6 max-w-xl text-[clamp(1.05rem,2.2vw,1.25rem)] leading-relaxed text-pretty text-slate-700">
-        One clear page for every state and union territory: what to see, what to eat, a little history, and how to get there.
+        Choose where to go by what you love and the month you’re travelling. Then read one clear page per state, with every fact traced to its source.
       </p>
 
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         <a
-          href="#guides-title"
+          href="/explore"
           class="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-6 font-semibold text-white shadow-sm transition hover:bg-accent-800"
         >
-          Browse the guides
-          <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M10 3a1 1 0 0 1 1 1v9.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42L9 13.6V4a1 1 0 0 1 1-1Z"></path></svg>
+          Find places to visit
+          <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M11.3 4.3a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4-1.4l3.29-3.3H3a1 1 0 1 1 0-2h11.59l-3.3-3.3a1 1 0 0 1 0-1.4Z"></path></svg>
         </a>
         <a
-          href="/search"
+          href="#guides-title"
           class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white/80 px-6 font-semibold text-slate-900 transition hover:border-slate-900"
         >
-          Search places
+          Browse state guides
         </a>
       </div>
 
       <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-700">
         {
-          ['Every fact sourced', 'Free, no sign-up', 'Independent, not a government site'].map((t) => (
+          ['Every fact sourced or flagged', 'Free, no sign-up', 'Independent, not a government site'].map((t) => (
             <li class="flex items-center gap-2">
               <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4 text-accent-700" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.58l7.3-7.3a1 1 0 0 1 1.4 0Z"></path></svg>
               {t}
@@ -67,7 +115,60 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
     </div>
   </section>
 
-  <section aria-labelledby="guides-title" class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+  <section aria-labelledby="why-title" class="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+    <h2 id="why-title" class="font-display text-[clamp(1.6rem,4vw,2.25rem)] leading-tight font-bold text-slate-900">Why plan with IndiaStates</h2>
+    <ul class="mt-6 grid gap-4 md:grid-cols-3">
+      {
+        pillars.map((p) => (
+          <li class="flex flex-col rounded-3xl bg-sand-50 p-6 ring-1 ring-sand-200/70">
+            <span class="grid h-11 w-11 place-items-center rounded-2xl bg-white text-accent-700 shadow-sm ring-1 ring-sand-200" aria-hidden="true">
+              <svg viewBox="0 0 20 20" class="h-5 w-5" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d={p.icon} /></svg>
+            </span>
+            <h3 class="mt-4 font-display text-xl font-bold text-slate-900">{p.title}</h3>
+            <p class="mt-2 leading-relaxed text-slate-700">{p.body}</p>
+            <a href={p.href} class="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-4 font-semibold text-accent-800 hover:text-slate-900">
+              {p.cta}
+              <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M11.3 4.3a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4-1.4l3.29-3.3H3a1 1 0 1 1 0-2h11.59l-3.3-3.3a1 1 0 0 1 0-1.4Z" /></svg>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="interests-title" class="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <h2 id="interests-title" class="font-display text-[clamp(1.6rem,4vw,2.25rem)] leading-tight font-bold text-slate-900">What are you into?</h2>
+      <a href="/explore" class="text-sm font-semibold text-accent-800 hover:text-slate-900">All {places.length} places</a>
+    </div>
+    <ul class="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      {
+        tiles.map((t) => (
+          <li>
+            <a href={`/explore?interest=${t.type}`} class="group relative isolate block overflow-hidden rounded-2xl bg-slate-900">
+              <Image
+                src={t.image!.src}
+                alt=""
+                widths={[320, 480, 640]}
+                sizes="(min-width: 1024px) 270px, 50vw"
+                class="aspect-[4/5] w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.04] sm:aspect-[4/3]"
+              />
+              <span class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" aria-hidden="true"></span>
+              <span class="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                <span class="block font-display text-lg leading-tight font-bold text-white sm:text-xl">{t.label}</span>
+                <span class="block text-sm text-white/80">{t.count} places</span>
+              </span>
+            </a>
+            <p class="mt-1.5 text-[11px] leading-snug text-slate-500">
+              <ImageCredit {...t.image!} />
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="guides-title" class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
       <h2 id="guides-title" class="font-display text-2xl font-semibold text-slate-900">State &amp; UT guides</h2>
       <p class="text-sm text-slate-600">{states.length} of {SITE.totalRegions} published</p>
@@ -76,10 +177,7 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
       {
         states.map(({ data }) => (
           <li>
-            <a
-              href={`/states/${data.slug}`}
-              class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-accent-700 hover:shadow-md"
-            >
+            <article class="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-accent-700 hover:shadow-md">
               <Image
                 src={data.hero_image.src}
                 alt=""
@@ -91,10 +189,15 @@ const states = (await getCollection('states')).sort((a, b) => a.data.name.locale
                 <p class="text-xs font-semibold tracking-wide text-slate-600 uppercase">
                   {data.type === 'state' ? 'State' : 'Union territory'} · {data.region}
                 </p>
-                <h3 class="mt-1 font-display text-xl font-semibold text-slate-900 group-hover:text-accent-800">{data.name}</h3>
+                <h3 class="mt-1 font-display text-xl font-semibold text-slate-900 group-hover:text-accent-800">
+                  <a href={`/states/${data.slug}`} class="after:absolute after:inset-0 after:content-['']">{data.name}</a>
+                </h3>
                 <p class="mt-1 line-clamp-2 text-sm text-slate-700">{data.tagline}</p>
+                <p class="relative z-10 mt-3 text-[11px] leading-snug text-slate-500">
+                  <ImageCredit {...data.hero_image} />
+                </p>
               </div>
-            </a>
+            </article>
           </li>
         ))
       }

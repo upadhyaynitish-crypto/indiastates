@@ -4,9 +4,11 @@ import { SITE } from '../site';
 interface Props {
   /** Colour of the wordmark; the mark itself is always teal. */
   tone?: 'dark' | 'light';
+  /** Show only the mark on very narrow phones (the name stays for screen readers). */
+  compact?: boolean;
   class?: string;
 }
-const { tone = 'dark', class: className } = Astro.props;
+const { tone = 'dark', compact = false, class: className } = Astro.props;
 ---
 
 <a
@@ -21,5 +23,5 @@ const { tone = 'dark', class: className } = Astro.props;
     <rect width="32" height="32" rx="8" fill="#0f766e"></rect>
     <path d="M16 7c-3.9 0-7 3-7 6.8 0 4.9 7 11.2 7 11.2s7-6.3 7-11.2C23 10 19.9 7 16 7Zm0 9.4a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z" fill="#fff"></path>
   </svg>
-  {SITE.name}
+  <span class:list={[compact && 'max-[359px]:sr-only']}>{SITE.name}</span>
 </a>

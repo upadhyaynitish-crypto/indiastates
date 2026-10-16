@@ -14,3 +14,17 @@ const SPOT_TYPE_LABEL: Record<string, string> = {
   'hill-station': 'Hill station',
 };
 export const spotTypeLabel = (t: string) => SPOT_TYPE_LABEL[t] ?? t.charAt(0).toUpperCase() + t.slice(1);
+
+// Plural labels for the "explore by interest" filters, in display order.
+export const INTERESTS: { type: string; label: string }[] = [
+  { type: 'heritage', label: 'Heritage' },
+  { type: 'fort', label: 'Forts' },
+  { type: 'religious', label: 'Sacred sites' },
+  { type: 'wildlife', label: 'Wildlife' },
+  { type: 'nature', label: 'Nature' },
+  { type: 'hill-station', label: 'Hill stations' },
+  { type: 'waterfall', label: 'Waterfalls' },
+  { type: 'beach', label: 'Beaches' },
+  { type: 'museum', label: 'Museums' },
+  { type: 'city', label: 'Cities' },
+];

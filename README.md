@@ -1,6 +1,6 @@
 # IndiaStates
 
-A free, independent guide to India's 28 states and 8 union territories. Static Astro site, deployable to Cloudflare Pages.
+A free, independent guide to India's 28 states and 8 union territories. Static Astro site, hosted on Cloudflare as Workers static assets (see wrangler.jsonc).
 
 > Independent informational site, not affiliated with the Government of India or any state government.
 

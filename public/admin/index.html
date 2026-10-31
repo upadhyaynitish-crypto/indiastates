@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>IndiaStates editor</title>
+    <!-- Absolute, so the editor works at /admin, /admin/ and /admin/index.html. -->
+    <link href="/admin/config.yml" type="application/yaml" rel="cms-config-url" />
   </head>
   <body>
-    <!-- Sveltia CMS reads ./config.yml. Pinned so an upstream release can't change the editor unannounced; see EDITING.md to upgrade. -->
+    <!-- Sveltia CMS reads the config linked above. Pinned so an upstream release can't change the editor unannounced; see EDITING.md to upgrade. -->
     <script src="https://unpkg.com/@sveltia/cms@0.246.1/dist/sveltia-cms.js"></script>
   </body>
 </html>

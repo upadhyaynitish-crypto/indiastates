@@ -1,0 +1,14 @@
+// Cloudflare hosting: the site is plain files in dist/ served as Workers static
+// assets (no server code). Static asset requests are free and unlimited.
+// Cloudflare's build settings: build command `npm run build`, deploy command `npx wrangler deploy`.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "indiastates",
+  "compatibility_date": "2026-10-16",
+  "assets": {
+    "directory": "./dist",
+    // /states/goa serves states/goa.html, matching Astro's build.format 'file' + trailingSlash 'never'.
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

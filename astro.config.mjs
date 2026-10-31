@@ -8,7 +8,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   // TODO: replace with the real production domain before launch.
   site: 'https://indiastates.pages.dev',
-  // `file` + `never` gives clean URLs on Cloudflare Pages: /states/goa (no trailing slash, no .html).
+  // `file` + `never` gives clean URLs on Cloudflare (see wrangler.jsonc): /states/goa (no trailing slash, no .html).
   build: { format: 'file' },
   trailingSlash: 'never',
 

@@ -36,6 +36,9 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // The map imports Leaflet lazily, so the dev server only discovers it on first use and then
+    // serves a stale copy ("504 Outdated Optimize Dep"). Pre-bundling it at startup avoids that.
+    optimizeDeps: { include: ['leaflet'] },
   },
 
   integrations: [sitemap({ filter: (page) => !page.endsWith('/search') })],

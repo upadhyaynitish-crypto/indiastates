@@ -5,6 +5,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "indiastates",
   "compatibility_date": "2026-10-16",
+  // Stated explicitly (these are Cloudflare's defaults) so builds don't warn.
+  // workers_dev: the free *.workers.dev address. preview_urls: test links for preview builds.
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     // /states/goa serves states/goa.html, matching Astro's build.format 'file' + trailingSlash 'never'.

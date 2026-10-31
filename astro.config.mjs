@@ -6,8 +6,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO: replace with the real production domain before launch.
-  site: 'https://indiastates.pages.dev',
+  // The live address. Change this one line when a custom domain is added.
+  site: 'https://indiastates.upadhyayn691.workers.dev',
   // `file` + `never` gives clean URLs on Cloudflare (see wrangler.jsonc): /states/goa (no trailing slash, no .html).
   build: { format: 'file' },
   trailingSlash: 'never',

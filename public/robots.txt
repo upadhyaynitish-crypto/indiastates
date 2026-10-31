@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
 
 # TODO: update the domain when the production URL is decided (also in astro.config.mjs).
 Sitemap: https://indiastates.pages.dev/sitemap-index.xml

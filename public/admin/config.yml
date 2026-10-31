@@ -1,0 +1,249 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms@0.246.1/schema/sveltia-cms.json
+#
+# Editor for the state guides. Every field here mirrors src/content.config.ts;
+# if you change one, change the other. The site build re-checks everything, so
+# a mistake the editor misses still can't reach the live site.
+
+backend:
+  name: github
+  # TODO: replace OWNER with your GitHub username once the project is on GitHub.
+  repo: OWNER/indiastates
+  branch: main
+
+# Photos live next to their state, e.g. src/assets/states/goa/, so Astro can resize them.
+# The states collection below sets the exact folder and the path written into each guide.
+media_folder: /src/assets/states
+public_folder: /src/assets/states
+
+output:
+  # Astro treats a missing optional field as "not set" but rejects an empty one.
+  omit_empty_optional_fields: true
+
+collections:
+  - name: states
+    label: States & UTs
+    label_singular: State or UT
+    description: >-
+      One guide per state or union territory. Every fact needs a source in the Sources list;
+      anything you can't source yet goes under "Still being checked".
+    folder: src/content/states
+    extension: md
+    format: frontmatter
+    create: true
+    delete: false
+    identifier_field: name
+    slug: '{{fields.slug}}'
+    summary: '{{name}} · {{region}}'
+    sortable_fields: [name, region, last_updated]
+    # Relative to this collection's folder, so a photo for goa.md is saved in src/assets/states/goa/
+    # and written into the guide as ../../assets/states/goa/photo.jpg (the form Astro expects).
+    media_folder: ../../assets/states/{{filename}}
+    public_folder: ../../assets/states/{{filename}}
+    editor:
+      preview: false
+    fields:
+      - { name: name, label: Name, widget: string }
+      - name: type
+        label: Type
+        widget: select
+        options:
+          - { label: State, value: state }
+          - { label: Union territory, value: union-territory }
+      - name: slug
+        label: Web address
+        widget: string
+        hint: Lower-case words joined by hyphens, e.g. tamil-nadu. This becomes /states/tamil-nadu and the file name. Don't change it on a published guide.
+        pattern: ['^[a-z0-9-]+$', 'Use only lower-case letters, numbers and hyphens']
+      - { name: tagline, label: Tagline, widget: text, hint: One sentence shown under the name on the photo. }
+      - name: description
+        label: Search description
+        widget: text
+        hint: What Google shows under the page title. 70 to 170 characters.
+        minlength: 70
+        maxlength: 170
+      - { name: capital, label: Capital, widget: string }
+      - { name: largest_city, label: Largest city, widget: string, required: false, hint: Leave empty unless confirmed against Census town tables. }
+      - name: official_languages
+        label: Official languages
+        widget: list
+        min: 1
+        field: { name: language, label: Language, widget: string }
+      - name: other_languages
+        label: Other languages spoken
+        widget: list
+        required: false
+        field: { name: language, label: Language, widget: string }
+      - { name: formed, label: Became a state / formed, widget: datetime, type: date, picker_utc: true }
+      - { name: area_km2, label: Area (km²), widget: number, value_type: float, min: 1 }
+      - name: population
+        label: Population
+        widget: object
+        hint: From the Census of India. Add the Census table to Sources.
+        fields:
+          - { name: value, label: People, widget: number, value_type: int, min: 1 }
+          - { name: year, label: Census year, widget: number, value_type: int, min: 1900, max: 2100 }
+      - name: literacy_rate
+        label: Literacy rate
+        widget: object
+        fields:
+          - { name: value, label: Percent, widget: number, value_type: float, min: 0.1, max: 100 }
+          - { name: year, label: Year, widget: number, value_type: int, min: 1900, max: 2100 }
+      - name: region
+        label: Region
+        widget: select
+        options: [North India, South India, East India, West India, Central India, Northeast India]
+      - name: neighbours
+        label: Neighbouring states
+        widget: list
+        required: false
+        hint: Indian states and UTs only.
+        field: { name: state, label: State or UT, widget: string }
+      - name: coordinates
+        label: Map centre (usually the capital)
+        widget: object
+        fields:
+          - { name: lat, label: Latitude, widget: number, value_type: float, min: 6, max: 37.5, hint: 'North–south, e.g. 15.4989' }
+          - { name: lng, label: Longitude, widget: number, value_type: float, min: 68, max: 97.5, hint: 'East–west, e.g. 73.8278' }
+      - name: best_time_to_visit
+        label: Best time to visit
+        widget: object
+        required: false
+        fields:
+          - name: months
+            label: Months
+            widget: string
+            hint: Full month names, e.g. "October to March" or "March to May and October to December".
+            pattern:
+              - '^(All year|(January|February|March|April|May|June|July|August|September|October|November|December)( to (January|February|March|April|May|June|July|August|September|October|November|December))?( and (January|February|March|April|May|June|July|August|September|October|November|December)( to (January|February|March|April|May|June|July|August|September|October|November|December))?)*)( \(.+\)|, .+)?$'
+              - 'Write full month names, e.g. "October to March". A note can follow in brackets or after a comma.'
+          - { name: note, label: Note, widget: text }
+      - name: airports
+        label: Airports
+        widget: list
+        required: false
+        label_singular: airport
+        summary: '{{code}} · {{name}}'
+        collapsed: auto
+        fields:
+          - { name: name, label: Airport name, widget: string }
+          - { name: code, label: IATA code, widget: string, pattern: ['^[A-Z]{3}$', 'Three capital letters, e.g. BOM'] }
+          - { name: city, label: City, widget: string }
+      - name: hero_image
+        label: Main photo
+        widget: object
+        hint: Only photos from Wikimedia Commons, Unsplash or your own. Run "npm run photo" to fill the credit for you (see EDITING.md).
+        fields: &photo
+          - { name: src, label: Photo, widget: image }
+          - { name: alt, label: Description for screen readers, widget: text, hint: 'Say what the photo shows, e.g. "Boats on Chilika Lake at sunset".' }
+          - { name: credit, label: Photographer / credit, widget: string, hint: 'Exactly as on the source page. Add "(cropped)" if you cropped it.' }
+          - { name: license, label: Licence, widget: string, hint: 'e.g. CC BY-SA 4.0, CC0 (public domain)' }
+          - { name: license_url, label: Licence link, widget: string, required: false, pattern: ['^https?://', 'Must be a full web address'] }
+          - { name: source_url, label: Source page, widget: string, hint: The Wikimedia Commons or Unsplash page for the photo., pattern: ['^https?://', 'Must be a full web address'] }
+      - name: tourist_spots
+        label: Places to visit
+        widget: list
+        min: 1
+        label_singular: place
+        summary: '{{name}} ({{type}})'
+        collapsed: auto
+        hint: Shown as numbered cards and map pins, in this order.
+        fields:
+          - { name: name, label: Name, widget: string }
+          - name: type
+            label: Type
+            widget: select
+            options:
+              - { label: Beach, value: beach }
+              - { label: City, value: city }
+              - { label: Fort, value: fort }
+              - { label: Heritage, value: heritage }
+              - { label: Hill station, value: hill-station }
+              - { label: Museum, value: museum }
+              - { label: Nature, value: nature }
+              - { label: Sacred site, value: religious }
+              - { label: Waterfall, value: waterfall }
+              - { label: Wildlife, value: wildlife }
+          - { name: description, label: Description, widget: text, hint: One or two sentences. }
+          - { name: lat, label: Latitude, widget: number, value_type: float, min: 6, max: 37.5 }
+          - { name: lng, label: Longitude, widget: number, value_type: float, min: 68, max: 97.5 }
+          - name: best_time
+            label: Best time
+            widget: string
+            hint: Full month names, e.g. "October to March". Used by the trip finder.
+            pattern:
+              - '^(All year|(January|February|March|April|May|June|July|August|September|October|November|December)( to (January|February|March|April|May|June|July|August|September|October|November|December))?( and (January|February|March|April|May|June|July|August|September|October|November|December)( to (January|February|March|April|May|June|July|August|September|October|November|December))?)*)( \(.+\)|, .+)?$'
+              - 'Write full month names, e.g. "October to March". A note can follow in brackets or after a comma.'
+          - { name: image, label: Photo, widget: object, required: false, fields: *photo }
+      - name: universities
+        label: Universities
+        widget: list
+        required: false
+        label_singular: university
+        collapsed: auto
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: city, label: City, widget: string }
+          - { name: type, label: Type, widget: string, hint: 'e.g. Central university, State university, Institute of National Importance' }
+          - { name: website, label: Official website, widget: string, pattern: ['^https?://', 'Must be a full web address'] }
+      - name: festivals
+        label: Festivals
+        widget: list
+        required: false
+        label_singular: festival
+        collapsed: auto
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: month, label: Month(s), widget: string, hint: 'e.g. "October or November"' }
+          - { name: description, label: Description, widget: text }
+      - name: famous_food
+        label: Food
+        widget: list
+        required: false
+        label_singular: dish
+        collapsed: auto
+        fields:
+          - { name: name, label: Dish, widget: string }
+          - { name: description, label: Description, widget: text }
+      - name: sources
+        label: Sources
+        widget: list
+        min: 1
+        label_singular: source
+        summary: '{{title}}'
+        collapsed: auto
+        hint: Every fact on the page must come from one of these. Prefer the Census, MoSPI and state government sites, with the year.
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: url, label: Web address, widget: string, pattern: ['^https?://', 'Must be a full web address'] }
+          - { name: supports, label: What it backs up, widget: text, required: false }
+      - name: needs_verification
+        label: Still being checked
+        widget: list
+        required: false
+        hint: Anything on the page you couldn't confirm yet. Visitors see this list.
+        field: { name: item, label: Item, widget: text }
+      - { name: last_updated, label: Last updated, widget: datetime, type: date, picker_utc: true }
+      - name: body
+        label: Article
+        widget: richtext
+        hint: Keep these section headings (Heading 2) and their order; the page adds photos, maps and tables under them.
+        default: |
+          ## Overview
+
+          ## History
+
+          ## Geography and climate
+
+          ## Economy
+
+          ## Culture, art and festivals
+
+          ## Food
+
+          ## Tourist spots
+
+          ## Education and universities
+
+          ## Getting there (air, rail, road)
+
+          ## Quick tips for visitors

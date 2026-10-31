@@ -69,6 +69,8 @@ For a Wikimedia Commons photo:
 3. In the editor, open the place's **Photo**, click **Choose** (or **Replace**) and pick the new file. Copy the credit details the helper printed into the fields below it.
 4. Write the **Description for screen readers** yourself, saying what the photo shows.
 
+For a state that doesn't have a guide yet, add `--new` at the end of the command. Without it the helper assumes a typo, e.g. `orissa` for `odisha`.
+
 For an Unsplash or your own photo, put the file in `src/assets/states/<state>/` and fill in the credit fields by hand. For your own photo, the credit is your name and the licence is whatever you choose, e.g. CC BY-SA 4.0.
 
 ### Add a new state or union territory

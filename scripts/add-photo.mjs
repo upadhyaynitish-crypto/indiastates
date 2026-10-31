@@ -5,6 +5,8 @@
 //   npm run photo -- <commons link> <state> [file-name]
 //   npm run photo -- https://commons.wikimedia.org/wiki/File:Konarka_Temple.jpg odisha konark
 //
+// For a state whose guide doesn't exist yet, add --new (this guards against typos like "orissa").
+//
 // Portrait photos are cropped to 4:3 (centre) so they fit the cards; the credit
 // then says "(cropped)", as the licences require for changed images.
 
@@ -15,8 +17,22 @@ import sharp from 'sharp';
 const UA = 'IndiaStates-dev/0.1 (static site build; low volume)';
 const MAX_WIDTH = 1920;
 
-const [input, state, name] = process.argv.slice(2).filter((a) => a !== '--force');
+const [input, state, name] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const force = process.argv.includes('--force');
+const isNew = process.argv.includes('--new');
+
+// Commons asks clients to slow down (429) when busy; wait and retry rather than give up.
+async function get(url) {
+  for (const wait of [0, 5, 15, 30]) {
+    if (wait) {
+      console.log(`  Wikimedia Commons is busy; trying again in ${wait} seconds…`);
+      await new Promise((r) => setTimeout(r, wait * 1000));
+    }
+    const res = await fetch(url, { headers: { 'User-Agent': UA } });
+    if (res.status !== 429 && res.status !== 503) return res;
+  }
+  fail('Wikimedia Commons is too busy right now. Try again in a few minutes.');
+}
 
 function fail(message) {
   console.error(`\n✗ ${message}\n`);
@@ -26,8 +42,9 @@ function fail(message) {
 if (!input || !state) {
   fail('Usage: npm run photo -- <Wikimedia Commons link> <state, e.g. goa> [file name]');
 }
-if (!existsSync(join('src/content/states', `${state}.md`)) && !existsSync(join('src/assets/states', state))) {
-  fail(`No state called "${state}". Use the web-address form, e.g. tamil-nadu (see src/content/states/).`);
+if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(state)) fail(`"${state}" isn't a web-address name. Use lower-case words joined by hyphens, e.g. tamil-nadu.`);
+if (!isNew && !existsSync(join('src/content/states', `${state}.md`)) && !existsSync(join('src/assets/states', state))) {
+  fail(`No state called "${state}". Check the spelling (see src/content/states/), or add --new if this is a new guide.`);
 }
 
 // Accept a file page link, an upload.wikimedia.org link or a bare "File:..." title.
@@ -61,7 +78,7 @@ api.search = new URLSearchParams({
   formatversion: '2',
 });
 
-const res = await fetch(api, { headers: { 'User-Agent': UA } });
+const res = await get(api);
 if (!res.ok) fail(`Wikimedia Commons answered ${res.status}. Try again in a minute.`);
 const page = (await res.json()).query?.pages?.[0];
 const info = page?.imageinfo?.[0];
@@ -91,7 +108,7 @@ const dir = join('src/assets/states', state);
 const out = join(dir, `${fileName}.jpg`);
 if (existsSync(out) && !force) fail(`${out} already exists. Give another file name, or add --force to replace it.`);
 
-const download = await fetch(info.thumburl ?? info.url, { headers: { 'User-Agent': UA } });
+const download = await get(info.thumburl ?? info.url);
 if (!download.ok) fail(`Download failed (${download.status}). Try again in a minute.`);
 const original = Buffer.from(await download.arrayBuffer());
 

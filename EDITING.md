@@ -119,9 +119,8 @@ Each save in the editor changes files in the IndiaStates folder. To publish them
 
 ### Later: edit on the live site, from any computer
 After the project is on GitHub:
-1. In `public/admin/config.yml`, replace `OWNER` in `repo: OWNER/indiastates` with your GitHub username.
-2. On GitHub, create a **fine-grained personal access token** (Settings → Developer settings) for this repository only, with **Contents: Read and write**.
-3. Open `https://<your site>/admin/`, click **Sign In Using Access Token** and paste it.
+1. On GitHub, create a **fine-grained personal access token** (Settings → Developer settings) for this repository only, with **Contents: Read and write**.
+2. Open `https://<your site>/admin`, click **Sign In Using Access Token** and paste it.
 
 Each save then becomes a commit on GitHub and the site republishes itself. Anyone without your token can open the page but can't change anything.
 

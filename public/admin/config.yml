@@ -6,8 +6,7 @@
 
 backend:
   name: github
-  # TODO: replace OWNER with your GitHub username once the project is on GitHub.
-  repo: OWNER/indiastates
+  repo: upadhyaynitish-crypto/indiastates
   branch: main
 
 # Photos live next to their state, e.g. src/assets/states/goa/, so Astro can resize them.

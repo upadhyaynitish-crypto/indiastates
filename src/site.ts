@@ -4,10 +4,10 @@ export const SITE = {
   disclaimer:
     'Independent informational site, not affiliated with the Government of India or any state government.',
   /**
-   * Where "Suggest a correction" links go. Replace with the real GitHub repo
-   * (issues enabled) before launch; `{page}` is filled with the page title.
+   * Where "Suggest a correction" links go (GitHub issues on the public repo);
+   * `{page}` is filled with the page title.
    */
-  correctionsUrl: 'https://github.com/OWNER/indiastates/issues/new?title=Correction%3A%20{page}',
+  correctionsUrl: 'https://github.com/upadhyaynitish-crypto/indiastates/issues/new?title=Correction%3A%20{page}',
   /** Total number of states and UTs the site will eventually cover. */
   totalRegions: 36,
 } as const;

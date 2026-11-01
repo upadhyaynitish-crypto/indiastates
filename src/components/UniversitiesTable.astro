@@ -8,8 +8,24 @@ interface Props {
 const { name, universities } = Astro.props;
 ---
 
-<div class="not-prose my-6 overflow-x-auto rounded-xl border border-slate-200" tabindex="0" role="region" aria-label={`Universities in ${name} (scrollable table)`}>
-  <table class="w-full min-w-[540px] border-collapse text-left text-sm">
+<!-- Phones: a stacked list (a three-column table would need sideways scrolling). -->
+<ul class="not-prose my-6 divide-y divide-slate-200 rounded-xl border border-slate-200 sm:hidden" aria-label={`Selected universities and institutes in ${name}`}>
+  {
+    universities.map((u) => (
+      <li class="px-4 py-3">
+        <a href={u.website} class="font-medium text-accent-800 underline underline-offset-2 hover:text-accent-900">
+          {u.name}
+        </a>
+        <span class="mt-0.5 block text-sm text-slate-600">
+          {u.city} · {u.type}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<div class="not-prose my-6 hidden overflow-x-auto rounded-xl border border-slate-200 sm:block">
+  <table class="w-full border-collapse text-left text-sm">
     <caption class="sr-only">Selected universities and institutes in {name}</caption>
     <thead class="bg-sand-50 text-xs tracking-wide text-slate-700 uppercase">
       <tr>

@@ -1,19 +1,17 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { listJoin } from '../lib/format';
 
 interface Props {
   state: CollectionEntry<'states'>['data'];
 }
 const { state } = Astro.props;
 const { best_time_to_visit: best, airports } = state;
-const languages = [...state.official_languages, ...state.other_languages];
 ---
 
 {
   (best || airports.length > 0) && (
     <section aria-labelledby="plan-title" class="mt-6 overflow-hidden rounded-3xl bg-slate-900 text-white">
-      <div class="grid gap-px bg-white/10 md:grid-cols-3">
+      <div class="grid gap-px bg-white/10 md:grid-cols-2">
         <div class="bg-slate-900 p-5 sm:p-6">
           <h2 id="plan-title" class="text-[11px] font-semibold tracking-[0.12em] text-teal-300 uppercase">
             Plan your trip · Best time
@@ -43,24 +41,10 @@ const languages = [...state.official_languages, ...state.other_languages];
               </li>
             ))}
           </ul>
-        </div>
-
-        <div class="bg-slate-900 p-5 sm:p-6">
-          <h3 class="text-[11px] font-semibold tracking-[0.12em] text-teal-300 uppercase">Good to know</h3>
-          <dl class="mt-3 space-y-3 text-sm">
-            <div>
-              <dt class="text-white/65">Languages</dt>
-              <dd class="font-medium">{listJoin(languages)}</dd>
-            </div>
-            <div>
-              <dt class="text-white/65">Getting around</dt>
-              <dd>
-                <a href="#getting-there-air-rail-road" class="font-medium underline underline-offset-2 hover:text-teal-200">
-                  Air, rail and road options
-                </a>
-              </dd>
-            </div>
-          </dl>
+          <a href="#getting-there-air-rail-road" class="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium underline underline-offset-2 hover:text-teal-200">
+            Rail and road options
+            <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4" fill="currentColor"><path d="M10 3a1 1 0 0 1 1 1v9.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42L9 13.6V4a1 1 0 0 1 1-1Z" /></svg>
+          </a>
         </div>
       </div>
     </section>

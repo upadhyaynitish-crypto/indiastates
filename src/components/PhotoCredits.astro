@@ -1,0 +1,36 @@
+---
+import ImageCredit from './ImageCredit.astro';
+
+interface Credit {
+  credit: string;
+  license: string;
+  license_url?: string;
+  source_url: string;
+}
+interface Props {
+  /** What each photo shows, in page order, with its credit fields. */
+  items: { label: string; image: Credit }[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+// The same photo can appear twice on a page (e.g. a tile and a card); credit it once.
+const unique = items.filter((it, i) => items.findIndex((o) => o.image.source_url === it.image.source_url) === i);
+---
+
+<!-- One credits list per page keeps photo grids clean on phones while every photo stays credited on the page. -->
+<details class:list={['group rounded-2xl bg-sand-50 text-sm ring-1 ring-sand-200/70', className]}>
+  <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold text-slate-900">
+    <span>Photo credits <span class="font-normal text-slate-600">({unique.length})</span></span>
+    <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4 shrink-0 transition group-open:rotate-180" fill="currentColor"><path d="M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4Z"></path></svg>
+  </summary>
+  <ul class="grid gap-x-8 gap-y-2 border-t border-sand-200/70 px-4 py-4 text-slate-700 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      unique.map((it) => (
+        <li class="leading-snug">
+          <span class="font-medium text-slate-900">{it.label}:</span>{' '}
+          <ImageCredit {...it.image} />
+        </li>
+      ))
+    }
+  </ul>
+</details>

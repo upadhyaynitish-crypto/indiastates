@@ -36,13 +36,20 @@ const { state } = Astro.props;
 
   {
     state.needs_verification.length > 0 && (
-      <div class="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
-        <h3 class="font-semibold">Still being checked</h3>
-        <p class="mt-1">These details are on the page but have not yet been confirmed against a primary source:</p>
-        <ul class="mt-2 list-disc space-y-1 pl-5">
-          {state.needs_verification.map((n) => <li>{n}</li>)}
-        </ul>
-      </div>
+      <details class="group mt-3 rounded-2xl border border-amber-300 bg-amber-50 text-sm text-amber-950">
+        <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold">
+          <span>
+            Still being checked <span class="font-normal">({state.needs_verification.length})</span>
+          </span>
+          <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4 shrink-0 transition group-open:rotate-180" fill="currentColor"><path d="M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4Z"></path></svg>
+        </summary>
+        <div class="border-t border-amber-200 px-4 py-4">
+          <p>These details are on the page but have not yet been confirmed against a primary source:</p>
+          <ul class="mt-2 list-disc space-y-1 pl-5">
+            {state.needs_verification.map((n) => <li>{n}</li>)}
+          </ul>
+        </div>
+      </details>
     )
   }
 
